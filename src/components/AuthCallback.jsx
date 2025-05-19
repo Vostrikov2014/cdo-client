@@ -12,6 +12,7 @@ const AuthCallback = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Проверка наличия токена в localStorage
         const token = localStorage.getItem('access_token');
         console.log('Token in localStorage:', token); // Для отладки
         if (token) {
@@ -25,6 +26,7 @@ const AuthCallback = () => {
 
         //.if (code && codeVerifier) {
         if (code) {
+            console.log('Получен код авторизации, попытка обмена токена.');
             const data = qs.stringify({
                 grant_type: 'authorization_code',
                 code,
@@ -49,9 +51,13 @@ const AuthCallback = () => {
                         navigate('/conferences');
                     } else {
                         console.error('No access token received');
+                        navigate('/login'); // Или обработайте ошибку по мере необходимости
                     }
                 })
-                .catch(error => console.error('Token exchange failed', error));
+                .catch(error => {
+                    console.error('Ошибка обмена токена', error);
+                    navigate('/login'); // Или обработайте ошибку по мере необходимости
+                });
         } else {
             // Если код или code_verifier нет, можно редиректить на страницу логина
             console.error("Code or code_verifier is missing");
