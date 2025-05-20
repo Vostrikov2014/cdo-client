@@ -24,7 +24,7 @@ import AddClassroom from "./components/schedule/AddClassroom.jsx";
 import StudentList from "./components/schedule/StudentList.jsx";
 import ClassroomList from "./components/schedule/ClassroomList.jsx";
 //import {generatePKCECode} from './utils/pkce';
-import { authConfig } from './config';
+//import { authConfig } from './config';
 
 
 const clientId = 'client';
@@ -32,11 +32,12 @@ const redirectUri = 'http://localhost:3000/callback';
 const authServerUrl = 'http://localhost:9000/oauth2/authorize';
 
 const App = () => {
-    //const location = useLocation();
+    const location = useLocation();
     //const [authenticated, setAuthenticated] = useState(false);
-    //const [username, setUsername] = useState(null);
+    const [username, setUsername] = useState(null);
 
     useEffect(() => {
+
         console.log('useEffect запущен');
         // Перенаправляем на страницу авторизации с PKCE
         //const codeChallenge = generatePKCECode();
@@ -44,16 +45,15 @@ const App = () => {
         // `${authServerUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 
         const token = localStorage.getItem('access_token');
-        console.log('Токен:', token);
-
         if (!token) {
             // Перенаправляем на страницу авторизации без PKCE
+            // Тут попытка из конфига взять, но это не сработало (пока, надо посмотреть)
             /*window.location.href =
                 `${authConfig.issuer}${authConfig.authorizationEndpoint}
                 ?client_id=${authConfig.clientId}
                 &redirect_uri=${authConfig.redirectUri}
                 &response_type=${authConfig.responseType}
-                &scope=${authConfig.scopes[0]}`;*/
+                &scope=openid profile`;*/
 
             window.location.href =
                 `${authServerUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid profile`;
@@ -69,30 +69,24 @@ const App = () => {
             //console.log('Authenticated:', authenticated);
 
             // Получаем имя пользователя из токена
-            //const payload = JSON.parse(atob(token.split('.')[1]));
-            //const userName = payload.preferred_username || payload.username || payload.sub;
-            //setUsername(userName);
-            //console.log('User Name:', username);
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userName = payload.preferred_username || payload.username || payload.sub;
+            setUsername(userName);
+            console.log('username:', username);
         }
-    }, []);
+    }, [username]);
+
+    console.log('useEffect закончил работу');
 
     // Отображение логотипа, имени пользователя, фона и пр. в зависимости от текущего пути
-    /*const disableLogoLink = location.pathname === '/';
+    const disableLogoLink = location.pathname === '/';
     const showLogo = location.pathname !== '/register' && location.pathname !== '/login';
     const showLogIn = location.pathname !== '/' && location.pathname !== '/login';
     const applyBackground = location.pathname === '/'
         || location.pathname === '/index-video-conf'
         || location.pathname === '/register'
         || location.pathname === '/login-app'
-        || location.pathname.startsWith('/conference');*/
-
-    console.log('useEffect закончил работу');
-
-    const disableLogoLink = false;
-    const showLogo = false;
-    const showLogIn = false;
-    const applyBackground =false;
-    const username = "aaa";
+        || location.pathname.startsWith('/conference');
 
     return (
 
@@ -148,9 +142,7 @@ const App = () => {
                             <Route path="/callback" element={<AuthCallback/>}/>
                         </Routes>
                     </div>
-                )
-                :
-                (
+                ) : (
                     <Layout>
                         <div className="d-flex flex-grow-1">
                             {showLogo && (
