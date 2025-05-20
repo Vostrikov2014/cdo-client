@@ -37,8 +37,6 @@ const App = () => {
     const [username, setUsername] = useState(null);
 
     useEffect(() => {
-
-        console.log('useEffect запущен');
         // Перенаправляем на страницу авторизации с PKCE
         //const codeChallenge = generatePKCECode();
         //window.location.href =
@@ -72,11 +70,8 @@ const App = () => {
             const payload = JSON.parse(atob(token.split('.')[1]));
             const userName = payload.preferred_username || payload.username || payload.sub;
             setUsername(userName);
-            console.log('username:', username);
         }
     }, [username]);
-
-    console.log('useEffect закончил работу');
 
     // Отображение логотипа, имени пользователя, фона и пр. в зависимости от текущего пути
     const disableLogoLink = location.pathname === '/';
@@ -89,7 +84,6 @@ const App = () => {
         || location.pathname.startsWith('/conference');
 
     return (
-
         <div>
             <div className="App"/>
             {applyBackground ? (

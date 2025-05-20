@@ -10,23 +10,13 @@ const HomeVideoConf = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        axiosInstance.get(`${BASE_URL}/conferences`,{ withCredentials: true
-
-            //axiosInstance.get(`${BASE_URL}/conferences`
-            /*, {
-            //headers: {
-            //    'Content-Type': 'application/json',
-            //    'Authorization': 'Bearer ' + localStorage.getItem('token')*/
-            /*auth: {
-                username: 'vd',
-                password: '111'
-            }*/
-
-        }).then(response => {
+        axiosInstance.get(`/conferences`)
+            .then(response => {
             setConferences(response.data)
-        }).catch((error) => {
-            console.log("Получение листа конференций из HomeVideoConf", error);
-            setError("Получение листа конференций из HomeVideoConf " + error);
+        })
+            .catch((err) => {
+            setError("Получение листа конференций из HomeVideoConf:   "
+                + err.response?.data?.message);
         })
     }, []);
 

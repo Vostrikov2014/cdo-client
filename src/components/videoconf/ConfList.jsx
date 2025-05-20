@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import {BASE_URL} from "../../config.js";
 import {Link} from 'react-router-dom';
 import ConfDelete from './ConfDelete.jsx';
@@ -11,15 +11,17 @@ const ConfList = () => {
     const [activeTab, setActiveTab] = useState('all');
 
 
-    /*useEffect(() => {
-        axiosInstance.get(`${BASE_URL}/conferences`).then(response => {
-            setConferences(response.data)
-        }).catch((error) => {
-            setError("There was an error fetching the Conference list. " + error);
-        })
-    }, []);*/
-
     useEffect(() => {
+        axiosInstance.get(`/conferences`)
+            .then(response => {
+            setConferences(response.data)
+        }).catch((err) => {
+            setError("There was an error fetching the Conference list. "
+                + err.response?.data?.message);
+        })
+    }, []);
+
+    /*useEffect(() => {
         const fetchConferences = async () => {
             try {
                 const response = await axiosInstance.get(`${BASE_URL}/conferences`);
@@ -30,7 +32,7 @@ const ConfList = () => {
         };
 
         fetchConferences();
-    }, []);
+    }, []);*/
 
     if (error) return <div>{error}</div>;
 

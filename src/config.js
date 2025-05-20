@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:8090';
+export const BASE_URL = 'http://localhost:8090/api';
 export const AUTH_URL = 'http://localhost:9000';
 
 export const authConfig = {

@@ -1,26 +1,23 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create({
+const api = axios.create({
+    baseURL: 'http://localhost:8090',
+    //timeout: 5000,
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     },
 });
 
-axiosInstance.interceptors.request.use(
+// Интерсептор для добавления токена в каждый запрос
+api.interceptors.request.use(
     (config) => {
-        //const username = localStorage.getItem('username'); //'vd'; //process.env.REACT_APP_API_USERNAME;
-        const payload = JSON.parse(atob(localStorage.getItem('access_token').split('.')[1]));
-        const username = payload.preferred_username || payload.username || payload.sub;
-        const password = '111'; //localStorage.getItem('password'); //'111'; //process.env.REACT_APP_API_PASSWORD;
-        if (username && password) {
-            config.auth = {
-                username,
-                password
-            }
+        const token = localStorage.getItem('access_token'); //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4g
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
     },
-    (err) => Promise.reject(err)
+    (error) => Promise.reject(error)
 );
 
-export default axiosInstance;
+export default api;
