@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {BrowserRouter, Link, Route, Routes, useLocation} from 'react-router-dom';
 import Logo from './components/Logo.jsx';
-import Home from './components/Home';
+import Index from './components/Index.jsx';
 import AuthCallback from './components/AuthCallback';
 import ConferenceList from './components/videoconf/ConferenceList.jsx';
 import IndexVideoConf from "./components/videoconf/IndexVideoConf.jsx";
@@ -23,20 +23,21 @@ import AddStudent from "./components/schedule/AddStudent.jsx";
 import AddClassroom from "./components/schedule/AddClassroom.jsx";
 import StudentList from "./components/schedule/StudentList.jsx";
 import ClassroomList from "./components/schedule/ClassroomList.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 //import {generatePKCECode} from './utils/pkce';
 //import { authConfig } from './config';
 
 
-const clientId = 'client';
-const redirectUri = 'http://localhost:3000/callback';
-const authServerUrl = 'http://localhost:9000/oauth2/authorize';
+//const clientId = 'client';
+//const redirectUri = 'http://localhost:3000/callback';
+//const authServerUrl = 'http://localhost:9000/oauth2/authorize';
 
 const App = () => {
     const location = useLocation();
     //const [authenticated, setAuthenticated] = useState(false);
     const [username, setUsername] = useState(null);
 
-    useEffect(() => {
+    /*useEffect(() => {
         // Перенаправляем на страницу авторизации с PKCE
         //const codeChallenge = generatePKCECode();
         //window.location.href =
@@ -46,34 +47,38 @@ const App = () => {
         if (!token) {
             // Перенаправляем на страницу авторизации без PKCE
             // Тут попытка из конфига взять, но это не сработало (пока, надо посмотреть)
-            /*window.location.href =
+            /!*window.location.href =
                 `${authConfig.issuer}${authConfig.authorizationEndpoint}
                 ?client_id=${authConfig.clientId}
                 &redirect_uri=${authConfig.redirectUri}
                 &response_type=${authConfig.responseType}
-                &scope=openid profile`;*/
+                &scope=openid profile`;*!/
 
             window.location.href =
                 `${authServerUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid profile`;
         } else {
-            /*fetch('http://localhost:9000/oauth2/userinfo', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-                .then((response) => response.json())*/
-
-            //setAuthenticated(true);
-            //console.log('Authenticated:', authenticated);
-
             // Получаем имя пользователя из токена
             const payload = JSON.parse(atob(token.split('.')[1]));
             const userName = payload.preferred_username || payload.username || payload.sub;
             setUsername(userName);
         }
-    }, [username]);
+    }, [username]);*/
 
-    // Отображение логотипа, имени пользователя, фона и пр. в зависимости от текущего пути
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const userName = payload.preferred_username || payload.username || payload.sub;
+                setUsername(userName);
+            } catch (err) {
+                console.error("Ошибка разбора токена:", err.message);
+                localStorage.removeItem('access_token');
+            }
+        }
+    }, []);
+
+    // Отображение логотипа, имени пользователя, фона и пр. в зависимости от маршрута
     const disableLogoLink = location.pathname === '/';
     const showLogo = location.pathname !== '/register' && location.pathname !== '/login';
     const showLogIn = location.pathname !== '/' && location.pathname !== '/login';
@@ -126,14 +131,19 @@ const App = () => {
                             </div>
                         )}
                         <Routes>
-                            <Route path="/" element={<Home/>}/>
+                            <Route path="/" element={<Index/>}/>
                             <Route path="/index-video-conf" element={<IndexVideoConf/>}/>
                             <Route path="/register-app" element={<RegisterApp/>}/>
                             <Route path="/login-app" element={<LoginApp/>}/>
-                            <Route path="/home-video-conf" element={<HomeVideoConf/>}/>
-                            <Route path="/conference/:roomName" element={<ConfStart/>}/>
-                            <Route path="/schedule" element={<Schedule/>}/>
-                            <Route path="/callback" element={<AuthCallback/>}/>
+                            <Route path="/login" element={<LoginApp/>}/>
+
+                            {/* Защищённые маршруты */}
+                            <Route element={<ProtectedRoute isAuthenticated={!!username} />}>
+                                <Route path="/home-video-conf" element={<HomeVideoConf/>}/>
+                                <Route path="/conference/:roomName" element={<ConfStart/>}/>
+                                <Route path="/schedule" element={<Schedule/>}/>
+                                <Route path="/callback" element={<AuthCallback/>}/>
+                            </Route>
                         </Routes>
                     </div>
                 ) : (
@@ -145,22 +155,25 @@ const App = () => {
                                 </div>
                             )}
                             <Routes>
-                                <Route path="/under-construction" element={<UnderConstruction/>}/>
-                                <Route path="/home-video-conf" element={<HomeVideoConf/>}/>
-                                <Route path="/create-conference" element={<ConfCreateUpdate/>}/>
-                                <Route path="/delete-conference" element={<ConfDelete/>}/>
-                                <Route path="/list-conference" element={<ConfList/>}/>
-                                <Route path="/conference-details/:id" element={<ConfDetails/>}/>
-                                <Route path="/active-conf" element={<ConfActive/>}/>
-                                <Route path="/create-lesson" element={<CreateLesson/>}/>
-                                <Route path="/edit-lesson/:id" element={<EditLesson/>}/>
-                                <Route path="/schedule" element={<Schedule/>}/>
-                                <Route path="/add-student" element={<AddStudent/>}/>
-                                <Route path="/add-classroom" element={<AddClassroom/>}/>
-                                <Route path="/students" element={<StudentList/>}/>
-                                <Route path="/classrooms" element={<ClassroomList/>}/>
-                                <Route path="/callback" element={<AuthCallback/>}/>
+                                <Route element={<ProtectedRoute isAuthenticated={!!username} />}>
+                                    <Route path="/home-video-conf" element={<HomeVideoConf/>}/>
+                                    <Route path="/create-conference" element={<ConfCreateUpdate/>}/>
+                                    <Route path="/delete-conference" element={<ConfDelete/>}/>
+                                    <Route path="/list-conference" element={<ConfList/>}/>
+                                    <Route path="/conference-details/:id" element={<ConfDetails/>}/>
+                                    <Route path="/active-conf" element={<ConfActive/>}/>
+                                    <Route path="/create-lesson" element={<CreateLesson/>}/>
+                                    <Route path="/edit-lesson/:id" element={<EditLesson/>}/>
+                                    <Route path="/schedule" element={<Schedule/>}/>
+                                    <Route path="/add-student" element={<AddStudent/>}/>
+                                    <Route path="/add-classroom" element={<AddClassroom/>}/>
+                                    <Route path="/students" element={<StudentList/>}/>
+                                    <Route path="/classrooms" element={<ClassroomList/>}/>
+                                    <Route path="/callback" element={<AuthCallback/>}/>
                                 {/*<Route path="/callback" element={<AuthCallback onSuccess={() => setAuthenticated(true)} />} />*/}
+                                </Route>
+
+                                <Route path="/under-construction" element={<UnderConstruction/>}/>
                             </Routes>
                         </div>
                     </Layout>

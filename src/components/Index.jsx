@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-const Home = () => {
+const Index = () => {
 
     return (
         <div>
@@ -21,7 +21,8 @@ const Home = () => {
                 alignItems: 'center',
                 height: '15vh',
                 flexWrap: 'wrap',
-                gap: '15px'
+                gap: '15px',
+                marginBottom: '15px'
             }}>
 
                 <div className="card p-4 shadow"
@@ -70,7 +71,7 @@ const Home = () => {
                 alignItems: 'center',
                 height: '10vh',
                 flexWrap: 'wrap',
-                gap: '15px'
+                gap: '15px',
             }}>
                 <div className="card p-4 shadow"
                      style={{
@@ -115,4 +116,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Index;
