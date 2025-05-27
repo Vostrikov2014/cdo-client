@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const conferenceServerUrl = 'http://localhost:8081/api/conferences';
+const conferenceServerUrl = 'http://localhost:8090/conferences';
 
 const ConferenceList = () => {
     const [conferences, setConferences] = useState([]);
